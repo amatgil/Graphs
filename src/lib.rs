@@ -1,4 +1,4 @@
-use std::hash::Hash;
+use std::{hash::Hash, mem};
 use std::
     fmt::Debug
 ;
@@ -198,8 +198,36 @@ impl<T> Graph<T> {
         self.nodes.iter().find(|n| n.name == x)
     }
 
-    pub fn get_node_mut(&mut self, x: char) -> Option<&mut Node<T>> {
-        self.nodes.iter_mut().find(|n| n.name == x)
+    /// Change the name of a node. 
+    ///
+    /// Returns the value of the changed node
+    ///
+    /// Errors if the name is already taken or if the wanted node does
+    /// not exist
+    pub fn change_node_name(&mut self, original: char, new: char) -> Result<&T, NodeNameChangeError> {
+        if self.nodes.iter().any(|x| x.name == new) {
+            return Err(NodeNameChangeError::NameAlreadyTaken);
+        }
+        if let Some(node) = self.nodes.iter_mut().find(|n| n.name == original) {
+            node.name = new;
+            Ok(&node.value)
+        } else {
+            Err(NodeNameChangeError::NodeNotFound)
+        }
+    }
+
+    /// Change the value of a node.
+    ///
+    /// Returns the value of the changed node
+    ///
+    /// Errors only if the wanted node does not exist
+    pub fn change_node_value(&mut self, node: char, mut new_val: T) -> Result<T, ()> {
+        if let Some(node) = self.nodes.iter_mut().find(|n| n.name == node) {
+            mem::swap(&mut new_val, &mut node.value);
+            Ok(new_val)
+        } else {
+            Err(())
+        }
     }
 
     /// Returns None if the matrix is non-symmetrical or has at least in the main diagonal, or also
@@ -224,4 +252,12 @@ impl<T> Graph<T> {
         let b_idx = self.nodes.iter().enumerate().find(|(_, x)| x.name == b)?.0;
         self.edges.has_adjacency(a_idx, b_idx)
     }
+}
+
+#[derive(Debug, Error)]
+pub enum NodeNameChangeError {
+    #[error("name was already taken")]
+    NameAlreadyTaken,
+    #[error("no such node in the graph")]
+    NodeNotFound
 }
