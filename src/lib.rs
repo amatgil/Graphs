@@ -1,5 +1,6 @@
 use std::hash::Hash;
 use std::{
+    fmt::Debug,
     cmp,
     collections::{BTreeSet, HashSet},
     error::Error,
@@ -7,6 +8,8 @@ use std::{
 
 use thiserror::Error;
 use utils::{coords_to_idx, has_duplicates};
+
+use crate::utils::dedup;
 
 mod utils;
 
@@ -102,55 +105,69 @@ impl<T> Graph<T> {
     /// rewritten. TODO as well
     pub fn from_list(lists: Vec<(Node<T>, Vec<Node<T>>)>) -> Result<Self, FromListError>
     where
-        Node<T>: Hash + Eq,
+        Node<T>: Hash + Eq + Debug, // NOTE: remember to delete the debug later
     {
-        // Pick out nodes from the indexes
-        let mut nodes: HashSet<&Node<T>> = HashSet::new();
-        // And from the lists
+        // Pick out nodes from the indexes and lists
+        // This determines the order in the matrix
+        let mut nodes: Vec<&Node<T>> = Vec::new();
         for (main, adjs) in &lists {
-            nodes.insert(main);
+            nodes.push(main);
             for n in adjs {
-                let _ = nodes.insert(n);
+                let _ = nodes.push(n);
             }
         }
 
-        // This collect determines the order in the matrix
-        let nodes: Vec<&Node<T>> = nodes.into_iter().collect();
+        dedup(&mut nodes);
+
         if has_duplicates(nodes.iter().map(|n| n.name)) {
             return Err(FromListError::NodesArentUnique);
         }
 
-        let n = nodes.len();
-        let mut matrix: Vec<Option<bool>> = Vec::with_capacity(n*n);
-        for i in 0..n {
-            matrix[coords_to_idx(i, i, n)] = Some(false);
+        let ordre = nodes.len();
+        let mut matriu = vec![None; ordre*ordre];
+        for i in 0..ordre {
+            matriu[coords_to_idx(i, i, ordre)] = Some(false);
         }
 
         for (i, u) in nodes.iter().enumerate() {
             for (j, v) in nodes.iter().enumerate() {
-                let index = coords_to_idx(i, j, n);
-                let index_symmetric = coords_to_idx(i, j, n);
+                let index = coords_to_idx(i, j, ordre);
+                let index_symmetric = coords_to_idx(i, j, ordre);
 
                 let adj_list = &lists.iter().find(|(x, _)| &x == u).expect("We already know it exists").1;
                 if adj_list.contains(v) { // u ~ v ?
                     // If we already said there hadn't, the list is not well formed
-                    if matrix[index] == Some(false) || matrix[index_symmetric] == Some(false) { return Err(FromListError::MalformedLists)}
-                    matrix[index] = Some(true);
-                    matrix[index_symmetric] = Some(true);
+                    if matriu[index] == Some(false) || matriu[index_symmetric] == Some(false) { return Err(FromListError::MalformedLists)}
+                    matriu[index] = Some(true);
+                    matriu[index_symmetric] = Some(true);
                 } else {
                     // If we already said there had, the list is not well formed
-                    if matrix[index] == Some(true) || matrix[index_symmetric] == Some(true) { return Err(FromListError::MalformedLists)}
-                    matrix[index] = Some(false);
-                    matrix[index_symmetric] = Some(false);
+                    if matriu[index] == Some(true) || matriu[index_symmetric] == Some(true) { return Err(FromListError::MalformedLists)}
+                    matriu[index] = Some(false);
+                    matriu[index_symmetric] = Some(false);
                 }
             }
         }
 
+        //  `lists` still owns the nodes, so we rebuild it to take ownership
+        let mut nodes: Vec<Node<T>> = Vec::new();
+        // And from the lists
+        for (main, adjs) in lists {
+            nodes.push(main);
+            for n in adjs {
+                let _ = nodes.push(n);
+            }
+        }
+        dedup(&mut nodes);
+
         Ok(Graph {
-            nodes: nodes.into_iter().map(|n| *n).collect(),
+            nodes: nodes.into_iter().collect(),
             edges: AdjMatrix {
-                values: todo!(),
-                n,
+                values: matriu.into_iter().map(|b| {
+                    if let Some(val) = b { val }
+                    else { false }
+                }).collect(),
+                n: ordre,
             },
         })
     }

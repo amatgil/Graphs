@@ -1,4 +1,4 @@
-use std::collections::BTreeSet;
+use std::{collections::{BTreeSet, HashSet}, hash::Hash};
 
 pub fn coords_to_idx(x: usize, y: usize, w: usize) -> usize {
     x + w * y
@@ -15,4 +15,19 @@ where
 {
     let mut uniq = BTreeSet::new();
     !iter.into_iter().all(move |x| uniq.insert(x))
+}
+
+pub fn dedup<T>(v: &mut Vec<T>) where T: Hash + Eq {
+    let mut set = HashSet::new();
+    let mut indices = Vec::new();
+
+    for i in 0..v.len() {
+        if !set.insert(&v[i]){
+            indices.push(i);
+        }
+    }
+
+    for (pos, e) in indices.iter().enumerate() {
+        v.remove(*e - pos);
+    }
 }
