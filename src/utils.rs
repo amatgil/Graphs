@@ -1,4 +1,7 @@
-use std::{collections::{BTreeSet, HashSet}, hash::Hash};
+use std::{
+    collections::{BTreeSet, HashSet},
+    hash::Hash,
+};
 
 pub fn coords_to_idx(x: usize, y: usize, w: usize) -> usize {
     x + w * y
@@ -17,17 +20,19 @@ where
     !iter.into_iter().all(move |x| uniq.insert(x))
 }
 
-pub fn dedup<T>(v: &mut Vec<T>) where T: Hash + Eq {
+pub fn dedup<T>(v: &mut Vec<T>)
+where
+    T: Hash + Eq + std::fmt::Debug,
+{
     let mut set = HashSet::new();
-    let mut indices = Vec::new();
+    let mut idxs = Vec::new();
 
     for i in 0..v.len() {
-        if !set.insert(&v[i]){
-            indices.push(i);
-        }
+        if !set.insert(&v[i]) { idxs.push(i); }
     }
 
-    for (pos, e) in indices.iter().enumerate() {
-        v.remove(*e - pos);
+    // Right to left, because it mslides them back 
+    for i in idxs.into_iter().rev() {
+        v.remove(i); 
     }
 }

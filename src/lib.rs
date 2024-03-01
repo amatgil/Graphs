@@ -1,9 +1,9 @@
 use std::hash::Hash;
 use std::{
-    fmt::Debug,
     cmp,
     collections::{BTreeSet, HashSet},
     error::Error,
+    fmt::Debug,
 };
 
 use thiserror::Error;
@@ -113,7 +113,7 @@ impl<T> Graph<T> {
         for (main, adjs) in &lists {
             nodes.push(main);
             for n in adjs {
-                let _ = nodes.push(n);
+                nodes.push(n);
             }
         }
 
@@ -124,7 +124,7 @@ impl<T> Graph<T> {
         }
 
         let ordre = nodes.len();
-        let mut matriu = vec![None; ordre*ordre];
+        let mut matriu = vec![None; ordre * ordre];
         for i in 0..ordre {
             matriu[coords_to_idx(i, i, ordre)] = Some(false);
         }
@@ -134,15 +134,24 @@ impl<T> Graph<T> {
                 let index = coords_to_idx(i, j, ordre);
                 let index_symmetric = coords_to_idx(i, j, ordre);
 
-                let adj_list = &lists.iter().find(|(x, _)| &x == u).expect("We already know it exists").1;
-                if adj_list.contains(v) { // u ~ v ?
+                let adj_list = &lists
+                    .iter()
+                    .find(|(x, _)| &x == u)
+                    .expect("We already know it exists")
+                    .1;
+                if adj_list.contains(v) {
+                    // u ~ v ?
                     // If we already said there hadn't, the list is not well formed
-                    if matriu[index] == Some(false) || matriu[index_symmetric] == Some(false) { return Err(FromListError::MalformedLists)}
+                    if matriu[index] == Some(false) || matriu[index_symmetric] == Some(false) {
+                        return Err(FromListError::MalformedLists);
+                    }
                     matriu[index] = Some(true);
                     matriu[index_symmetric] = Some(true);
                 } else {
                     // If we already said there had, the list is not well formed
-                    if matriu[index] == Some(true) || matriu[index_symmetric] == Some(true) { return Err(FromListError::MalformedLists)}
+                    if matriu[index] == Some(true) || matriu[index_symmetric] == Some(true) {
+                        return Err(FromListError::MalformedLists);
+                    }
                     matriu[index] = Some(false);
                     matriu[index_symmetric] = Some(false);
                 }
@@ -155,18 +164,20 @@ impl<T> Graph<T> {
         for (main, adjs) in lists {
             nodes.push(main);
             for n in adjs {
-                let _ = nodes.push(n);
+                nodes.push(n);
             }
         }
         dedup(&mut nodes);
 
+        if matriu.iter().any(|b| b.is_none()) {
+            return Err(FromListError::MalformedLists);
+        }
+        let values = matriu.into_iter().map(|b| b.expect("We've already verified they're all Some")).collect();
+
         Ok(Graph {
             nodes: nodes.into_iter().collect(),
             edges: AdjMatrix {
-                values: matriu.into_iter().map(|b| {
-                    if let Some(val) = b { val }
-                    else { false }
-                }).collect(),
+                values,
                 n: ordre,
             },
         })
