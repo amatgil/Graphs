@@ -108,14 +108,14 @@ fn from_a_list() {
 fn from_a_list_again() {
     // Graph should be something like (drawn with https://asciiflow.com/#/)
     //          A   <---- Lone node
-    //                  
-    //                  
-    //                  
+    //
+    //
+    //
     //   B      C──────D
-    //   │      │       
-    //   │      │       
-    //   │      │       
-    //   └───── E       
+    //   │      │
+    //   │      │
+    //   │      │
+    //   └───── E
     let a = Node::<()>::new('A', None);
     let b = Node::<()>::new('B', None);
     let c = Node::<()>::new('C', None);
@@ -155,8 +155,8 @@ fn from_a_list_again() {
     ];
 
     // e ~ c but c !~ e (oops)
-    assert!(Graph::<()>::from_list(init_no_sym).is_err());
-    
+    assert!(Graph::<()>::from_list(init_no_sym).is_err()); // TODO: fix later
+
     // b ~ b lmao
     assert!(Graph::<()>::from_list(init_loop).is_err());
 
@@ -165,21 +165,20 @@ fn from_a_list_again() {
     let g = Graph::<()>::from_list(init).unwrap();
     dbg!(&g);
 
-    assert!(g.has_adjacency('A', 'B').unwrap());
-    assert!(g.has_adjacency('A', 'C').unwrap());
+    assert!(!g.has_adjacency('A', 'B').unwrap());
+    assert!(!g.has_adjacency('A', 'C').unwrap());
     assert!(!g.has_adjacency('A', 'D').unwrap());
+    assert!(!g.has_adjacency('A', 'E').unwrap());
 
-    assert!(g.has_adjacency('B', 'A').unwrap());
-    assert!(g.has_adjacency('C', 'A').unwrap());
-    assert!(!g.has_adjacency('D', 'A').unwrap());
-
-    assert!(g.has_adjacency('C', 'A').unwrap());
-    assert!(g.has_adjacency('C', 'D').unwrap());
-    assert!(!g.has_adjacency('C', 'B').unwrap());
-
-    assert!(g.has_adjacency('A', 'C').unwrap());
-    assert!(g.has_adjacency('D', 'C').unwrap());
     assert!(!g.has_adjacency('B', 'C').unwrap());
+    assert!(!g.has_adjacency('B', 'D').unwrap());
+    assert!(g.has_adjacency('B', 'E').unwrap());
+
+    assert!(g.has_adjacency('C', 'D').unwrap());
+    assert!(g.has_adjacency('C', 'E').unwrap());
+
+    assert!(!g.has_adjacency('E', 'D').unwrap());
 
     assert!(g.has_adjacency('A', 'F').is_none());
+    assert!(g.has_adjacency('Z', 'F').is_none());
 }

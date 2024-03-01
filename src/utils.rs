@@ -22,17 +22,19 @@ where
 
 pub fn dedup<T>(v: &mut Vec<T>)
 where
-    T: Hash + Eq + std::fmt::Debug,
+    T: Hash + Eq,
 {
     let mut set = HashSet::new();
     let mut idxs = Vec::new();
 
-    for i in 0..v.len() {
-        if !set.insert(&v[i]) { idxs.push(i); }
+    for (i, elem) in v.iter().enumerate() {
+        if !set.insert(elem) {
+            idxs.push(i);
+        }
     }
 
-    // Right to left, because it mslides them back 
+    // Right to left, because it mslides them back
     for i in idxs.into_iter().rev() {
-        v.remove(i); 
+        v.remove(i);
     }
 }

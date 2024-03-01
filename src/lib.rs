@@ -1,13 +1,10 @@
 use std::hash::Hash;
-use std::{
-    cmp,
-    collections::{BTreeSet, HashSet},
-    error::Error,
-    fmt::Debug,
-};
+use std::
+    fmt::Debug
+;
 
 use thiserror::Error;
-use utils::{coords_to_idx, has_duplicates};
+use utils::{coords_to_idx, has_duplicates, idx_to_coords};
 
 use crate::utils::dedup;
 
@@ -105,7 +102,7 @@ impl<T> Graph<T> {
     /// rewritten. TODO as well
     pub fn from_list(lists: Vec<(Node<T>, Vec<Node<T>>)>) -> Result<Self, FromListError>
     where
-        Node<T>: Hash + Eq + Debug, // NOTE: remember to delete the debug later
+        Node<T>: Hash + Eq,
     {
         // Pick out nodes from the indexes and lists
         // This determines the order in the matrix
@@ -137,7 +134,7 @@ impl<T> Graph<T> {
                 let adj_list = &lists
                     .iter()
                     .find(|(x, _)| &x == u)
-                    .expect("We already know it exists")
+                    .ok_or(FromListError::MalformedLists)?
                     .1;
                 if adj_list.contains(v) {
                     // u ~ v ?
@@ -169,17 +166,31 @@ impl<T> Graph<T> {
         }
         dedup(&mut nodes);
 
-        if matriu.iter().any(|b| b.is_none()) {
+        if matriu.iter().any(Option::is_none) {
             return Err(FromListError::MalformedLists);
         }
-        let values = matriu.into_iter().map(|b| b.expect("We've already verified they're all Some")).collect();
+
+        let values: Vec<bool> = matriu
+            .into_iter()
+            .map(|b| b.expect("We've already verified they're all Some"))
+            .collect();
+
+        // Check symmetry and zeros down the diagonal, just in case
+        for i in 0..ordre * ordre {
+            let (x, y) = idx_to_coords(i, ordre);
+            let i_prime = coords_to_idx(y, x, ordre);
+
+            if values[i] != values[i_prime] {
+                return Err(FromListError::MalformedLists);
+            }
+            if x == y && values[i] {
+                return Err(FromListError::MalformedLists);
+            }
+        }
 
         Ok(Graph {
             nodes: nodes.into_iter().collect(),
-            edges: AdjMatrix {
-                values,
-                n: ordre,
-            },
+            edges: AdjMatrix { values, n: ordre },
         })
     }
 
