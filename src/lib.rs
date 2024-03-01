@@ -1,4 +1,9 @@
-use std::{cmp, error::Error};
+use std::hash::Hash;
+use std::{
+    cmp,
+    collections::{BTreeSet, HashSet},
+    error::Error,
+};
 
 use thiserror::Error;
 use utils::{coords_to_idx, has_duplicates};
@@ -57,7 +62,7 @@ impl AdjMatrix {
 
 /// Basic Node type, which the graph connects. Note that changing its name or its value (if any)
 /// will NOT change the structure of the graph.
-#[derive(Clone, Debug, PartialEq, Eq)]
+#[derive(Clone, Debug, PartialEq, Eq, Copy, Hash)]
 pub struct Node<T> {
     pub name: char,
     pub value: Option<T>,
@@ -84,11 +89,70 @@ pub enum FromMatrixError {
 pub enum FromListError {
     #[error("the names of the nodes contain duplicates")]
     NodesArentUnique,
+    #[error("nodes may not be adjacent to themselves")]
+    SelfReferentialNode,
+    #[error("the lists do not agree on adjacency")]
+    MalformedLists,
 }
 
 impl<T> Graph<T> {
-    pub fn from_list(lists: &[(Node<T>, &[Node<T>])]) -> Result<Self, FromListError> {
-        todo!()
+    /// TODO: Change the bounds from Hash + Eq to something easier? Though these seem optimal
+    ///
+    /// This function is probably pretty awful in complexity, space and efficiency and should likely be
+    /// rewritten. TODO as well
+    pub fn from_list(lists: Vec<(Node<T>, Vec<Node<T>>)>) -> Result<Self, FromListError>
+    where
+        Node<T>: Hash + Eq,
+    {
+        // Pick out nodes from the indexes
+        let mut nodes: HashSet<&Node<T>> = HashSet::new();
+        // And from the lists
+        for (main, adjs) in &lists {
+            nodes.insert(main);
+            for n in adjs {
+                let _ = nodes.insert(n);
+            }
+        }
+
+        // This collect determines the order in the matrix
+        let nodes: Vec<&Node<T>> = nodes.into_iter().collect();
+        if has_duplicates(nodes.iter().map(|n| n.name)) {
+            return Err(FromListError::NodesArentUnique);
+        }
+
+        let n = nodes.len();
+        let mut matrix: Vec<Option<bool>> = Vec::with_capacity(n*n);
+        for i in 0..n {
+            matrix[coords_to_idx(i, i, n)] = Some(false);
+        }
+
+        for (i, u) in nodes.iter().enumerate() {
+            for (j, v) in nodes.iter().enumerate() {
+                let index = coords_to_idx(i, j, n);
+                let index_symmetric = coords_to_idx(i, j, n);
+
+                let adj_list = &lists.iter().find(|(x, _)| &x == u).expect("We already know it exists").1;
+                if adj_list.contains(v) { // u ~ v ?
+                    // If we already said there hadn't, the list is not well formed
+                    if matrix[index] == Some(false) || matrix[index_symmetric] == Some(false) { return Err(FromListError::MalformedLists)}
+                    matrix[index] = Some(true);
+                    matrix[index_symmetric] = Some(true);
+                } else {
+                    // If we already said there had, the list is not well formed
+                    if matrix[index] == Some(true) || matrix[index_symmetric] == Some(true) { return Err(FromListError::MalformedLists)}
+                    matrix[index] = Some(false);
+                    matrix[index_symmetric] = Some(false);
+                }
+            }
+        }
+
+        Ok(Graph {
+            nodes: nodes.into_iter().map(|n| *n).collect(),
+            edges: AdjMatrix {
+                values: todo!(),
+                n,
+            },
+        })
     }
 
     /// Returns None if the matrix is non-symmetrical or has at least in the main diagonal, or also

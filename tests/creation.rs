@@ -75,12 +75,30 @@ fn from_a_list() {
     let c = Node::<()>::new('C', None);
     let d = Node::<()>::new('D', None);
 
-    let init: Vec<(Node<()>, &Vec<Node<()>>)> = vec![
-        (a, &vec![b, c]),
-        (b, &vec![a, d]),
-        (c, &vec![a, d]),
-        (d, &vec![b, c]),
+    let init = vec![
+        (a, vec![b, c]),
+        (b, vec![a, d]),
+        (c, vec![a, d]),
+        (d, vec![b, c]),
     ];
 
-    let g = Graph::<()>::from_list(&*init).unwrap();
+    let g = Graph::<()>::from_list(init).unwrap();
+
+    assert!(g.has_adjacency('A', 'B').unwrap());
+    assert!(g.has_adjacency('A', 'C').unwrap());
+    assert!(!g.has_adjacency('A', 'D').unwrap());
+
+    assert!(g.has_adjacency('B', 'A').unwrap());
+    assert!(g.has_adjacency('C', 'A').unwrap());
+    assert!(!g.has_adjacency('D', 'A').unwrap());
+
+    assert!(g.has_adjacency('C', 'A').unwrap());
+    assert!(g.has_adjacency('C', 'D').unwrap());
+    assert!(!g.has_adjacency('C', 'B').unwrap());
+
+    assert!(g.has_adjacency('A', 'C').unwrap());
+    assert!(g.has_adjacency('D', 'C').unwrap());
+    assert!(!g.has_adjacency('B', 'C').unwrap());
+
+    assert!(g.has_adjacency('A', 'F').is_none());
 }
