@@ -1,41 +1,39 @@
-use graphs::Graph;
-
+use graphs::{Graph, Node};
 
 #[test]
 fn from_a_matrix() {
     // Graph should be something like
-    //┌─────A     
-    //│     │     
-    //│     │     
+    //┌─────A
+    //│     │
+    //│     │
     //│     C────┐
     //│          │
     //│          │
     //B──────────D
 
     let init = [
-    //   A      B      C      D
-        [false, true,  true,  false], // A
-        [true,  false, false, true], // B
-        [true,  false, false, true], // C
-        [false, true,  true,  false], // D
+        //   A      B      C      D
+        [false, true, true, false], // A
+        [true, false, false, true], // B
+        [true, false, false, true], // C
+        [false, true, true, false], // D
     ];
 
     let init_not_symmetric = [
-    //   A      B      C      D
-        [false, true,  true,  false], // A
-        [true,  false, false, true], // B
-        [true,  false, false, true], // C
-        [true,  true,  true,  false], // D
+        //   A      B      C      D
+        [false, true, true, false], // A
+        [true, false, false, true], // B
+        [true, false, false, true], // C
+        [true, true, true, false],  // D
     ];
 
     let init_not_zeros = [
-    //   A      B      C      D
-        [false, true,  true,  false], // A
-        [true,  true, false, true], // B
-        [true,  false, false, true], // C
-        [false, true,  true,  false], // D
+        //   A      B      C      D
+        [false, true, true, false], // A
+        [true, true, false, true],  // B
+        [true, false, false, true], // C
+        [false, true, true, false], // D
     ];
-
 
     assert!(Graph::<()>::from_matrix(['A', 'B', 'C', 'D'], init_not_symmetric).is_err());
     assert!(Graph::<()>::from_matrix(['A', 'B', 'C', 'D'], init_not_zeros).is_err());
@@ -59,4 +57,30 @@ fn from_a_matrix() {
     assert!(!g.has_adjacency('B', 'C').unwrap());
 
     assert!(g.has_adjacency('A', 'F').is_none());
+}
+
+#[test]
+fn from_a_list() {
+    // Graph should be something like
+    //┌─────A
+    //│     │
+    //│     │
+    //│     C────┐
+    //│          │
+    //│          │
+    //B──────────D
+
+    let a = Node::<()>::new('A', None);
+    let b = Node::<()>::new('B', None);
+    let c = Node::<()>::new('C', None);
+    let d = Node::<()>::new('D', None);
+
+    let init: Vec<(Node<()>, &Vec<Node<()>>)> = vec![
+        (a, &vec![b, c]),
+        (b, &vec![a, d]),
+        (c, &vec![a, d]),
+        (d, &vec![b, c]),
+    ];
+
+    let g = Graph::<()>::from_list(&*init).unwrap();
 }
