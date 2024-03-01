@@ -65,12 +65,12 @@ impl AdjMatrix {
 #[derive(Clone, Debug, PartialEq, Eq, Copy, Hash)]
 pub struct Node<T> {
     pub name: char,
-    pub value: Option<T>,
+    pub value: T,
 }
 
 impl<T> Node<T> {
     /// Convenience, normal constructor may also be used without problems
-    pub fn new(name: char, value: Option<T>) -> Self {
+    pub fn new(name: char, value: T) -> Self {
         Self { name, value }
     }
 }
@@ -206,12 +206,13 @@ impl<T> Graph<T> {
     /// if one of the names is repeated
     pub fn from_matrix<const N: usize>(
         names: [char; N],
+        values: [T; N],
         m: [[bool; N]; N],
     ) -> Result<Self, FromMatrixError> {
         if has_duplicates(names) {
             return Err(FromMatrixError::NodesArentUnique)?;
         }
-        let nodes = names.into_iter().map(|c| Node::new(c, None)).collect();
+        let nodes = names.into_iter().zip(values).map(|(c, v)| Node::new(c, v)).collect();
         let edges = AdjMatrix::from_mat(m)?;
 
         Ok(Graph { nodes, edges })

@@ -14,11 +14,14 @@ fn get_basic() {
     let init = [
     //   A      B      C      D
         [false, true,  true,  false], // A
-        [true,  false, false, true], // B
-        [true,  false, false, true], // C
+        [true,  false, false, true],  // B
+        [true,  false, false, true],  // C
         [false, true,  true,  false], // D
     ];
-    let g = Graph::<()>::from_matrix(['A', 'B', 'C', 'D'], init).unwrap();
+    let mut g = Graph::<()>::from_matrix(['A', 'B', 'C', 'D'], [(); 4], init).unwrap();
 
-    assert_eq!(g.get_node('C').unwrap(), &Node::new('C', None));
+    assert_eq!(g.get_node('C').unwrap(), &Node::new('C', ()));
+    *g.get_node_mut('C').unwrap() = Node::new('Z', ());
+    assert!(g.get_node('C').is_none());
+
 }

@@ -35,10 +35,10 @@ fn from_a_matrix() {
         [false, true, true, false], // D
     ];
 
-    assert!(Graph::<()>::from_matrix(['A', 'B', 'C', 'D'], init_not_symmetric).is_err());
-    assert!(Graph::<()>::from_matrix(['A', 'B', 'C', 'D'], init_not_zeros).is_err());
+    assert!(Graph::<()>::from_matrix(['A', 'B', 'C', 'D'], [(); 4], init_not_symmetric).is_err());
+    assert!(Graph::<()>::from_matrix(['A', 'B', 'C', 'D'], [(); 4], init_not_zeros).is_err());
 
-    let g = Graph::<()>::from_matrix(['A', 'B', 'C', 'D'], init).unwrap();
+    let g = Graph::<()>::from_matrix(['A', 'B', 'C', 'D'], [(); 4], init).unwrap();
 
     assert!(g.has_adjacency('A', 'B').unwrap());
     assert!(g.has_adjacency('A', 'C').unwrap());
@@ -70,10 +70,10 @@ fn from_a_list() {
     //│          │
     //B──────────D
 
-    let a = Node::<()>::new('A', None);
-    let b = Node::<()>::new('B', None);
-    let c = Node::<()>::new('C', None);
-    let d = Node::<()>::new('D', None);
+    let a = Node::<()>::new('A', ());
+    let b = Node::<()>::new('B', ());
+    let c = Node::<()>::new('C', ());
+    let d = Node::<()>::new('D', ());
 
     let init = vec![
         (a, vec![b, c]),
@@ -116,11 +116,11 @@ fn from_a_list_again() {
     //   │      │
     //   │      │
     //   └───── E
-    let a = Node::<()>::new('A', None);
-    let b = Node::<()>::new('B', None);
-    let c = Node::<()>::new('C', None);
-    let d = Node::<()>::new('D', None);
-    let e = Node::<()>::new('E', None);
+    let a = Node::<()>::new('A', ());
+    let b = Node::<()>::new('B', ());
+    let c = Node::<()>::new('C', ());
+    let d = Node::<()>::new('D', ());
+    let e = Node::<()>::new('E', ());
 
     let init = vec![
         (a, vec![]),
