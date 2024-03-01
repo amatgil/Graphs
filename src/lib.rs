@@ -42,13 +42,7 @@ impl AdjMatrix {
             n: N,
         })
     }
-    /// Takes a list of lists and returns the corresponding adjacency matrix.  
-    //pub fn from_lists(lists: &[&[Node<T>]]) -> Result<Self, FromListError> {
-    //    let n = cmp::max(
-    //        lists.iter().fold(0, |acc, l| cmp::max(acc, l.len())),
-    //        lists.len(),
-    //    );
-    //}
+
     /// Panics if either a or b are out of bounds
     fn has_adjacency(&self, a: usize, b: usize) -> Option<bool> {
         if a > self.n || b > self.n {
