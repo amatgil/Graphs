@@ -48,7 +48,7 @@ impl AdjMatrix {
 /// Basic Node type, which the graph connects. Note that changing its name or its value (if any)
 /// will NOT change the structure of the graph.
 #[derive(Clone, Debug, PartialEq, Eq)]
-struct Node<T> {
+pub struct Node<T> {
     pub name: char,
     pub value: Option<T>,
 }
@@ -75,6 +75,14 @@ enum FromMatrixError {
 impl<T> Graph<T> {
     pub fn from_list(v: &[Node<T>]) {
         todo!()
+    }
+
+    pub fn get_node(&self, x: char) -> Option<&Node<T>> {
+        self.nodes.iter().find(|n| n.name == x)
+    }
+
+    pub fn get_node_mut(&mut self, x: char) -> Option<&mut Node<T>> {
+        self.nodes.iter_mut().find(|n| n.name == x)
     }
 
     /// Returns None if the matrix is non-symmetrical or has at least in the main diagonal, or also
