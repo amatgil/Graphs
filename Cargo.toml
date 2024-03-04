@@ -7,3 +7,4 @@ edition = "2021"
 
 [dependencies]
 thiserror = "1.0.57"
+ppmitzador = { git = "ssh://git@ilsrv.com:6722/Amat/ppmitzador.git" }

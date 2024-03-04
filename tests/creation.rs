@@ -109,8 +109,6 @@ fn from_a_list_again() {
     // Graph should be something like (drawn with https://asciiflow.com/#/)
     //          A   <---- Lone node
     //
-    //
-    //
     //   B      C──────D
     //   │      │
     //   │      │

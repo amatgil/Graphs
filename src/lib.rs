@@ -9,6 +9,8 @@ use utils::{coords_to_idx, has_duplicates, idx_to_coords};
 use crate::utils::dedup;
 
 mod utils;
+mod properties;
+mod traversal;
 
 #[derive(Clone, Debug, PartialEq, Eq)]
 pub struct Graph<T> {
