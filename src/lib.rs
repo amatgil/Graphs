@@ -54,6 +54,11 @@ impl AdjMatrix {
             Some(self.values[coords_to_idx(a, b, self.n)])
         }
     }
+
+    /// Assumes x is in bounds
+    fn get_adjacent(&self, x: usize) -> &[bool] {
+        &self.values[x*4..(x+1)*4]
+    }
 }
 
 /// Basic Node type, which the graph connects. Note that changing its name or its value (if any)
@@ -248,6 +253,13 @@ impl<T> Graph<T> {
         let a_idx = self.nodes.iter().enumerate().find(|(_, x)| x.name == a)?.0;
         let b_idx = self.nodes.iter().enumerate().find(|(_, x)| x.name == b)?.0;
         self.edges.has_adjacency(a_idx, b_idx)
+    }
+    pub fn adjacent_nodes(&self, c: char) -> Option<Vec<&Node<T>>> {
+        let i = self.nodes.iter().position(|x| x.name == c)?;
+        let is_part_of = self.edges.get_adjacent(i);
+        if is_part_of.len() != self.nodes.len() { return None; }
+
+        Some(self.nodes.iter().zip(is_part_of).filter(|(_n, b)| **b ).map(|(n, _)| n).collect())
     }
 }
 
