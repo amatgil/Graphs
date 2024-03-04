@@ -14,7 +14,7 @@ impl<T> Graph<T> {
     pub fn dfs<'a, 'b>(
         &'a self,
         v: &'b Node<T>,
-    ) -> Result<(Vec<&'b Node<T>>, Vec<(&'b Node<T>, &'b Node<T>)>), DFSError>
+    ) -> Result<(Vec<&'a Node<T>>, Vec<(&'a Node<T>, &'a Node<T>)>), DFSError>
     where
         'b: 'a,
         T: PartialEq

@@ -1,20 +1,15 @@
-use std::path::PathBuf;
-
-use ppmitzador::{ImagePBM, PpmFormat};
+use std::{fmt::Debug, path::PathBuf}; // TODO: Remove this when done
 
 use crate::{traversal::DFSError, Graph, Node};
 
 impl<T> Graph<T> {
-    fn is_tree(&self) -> bool where T: PartialEq {
+    pub fn is_tree(&self) -> bool where T: PartialEq + Debug {
         let Some(v) = self.nodes.get(0) else { return true; };
 
         let mut w = vec![v];   
-        let mut visited = vec![(v, 0)]; // tuples of (vertex, id) where the id is one more than the
-                                        // id of its parents. if a vertex would have two ids, we have
-                                        // a tree
+        let mut visited = vec![(v, None)]; // tuples of (vertex, Option<Parent>)
         let mut stack = vec![v];
 
-        let mut i = 1;
         while let Some(x) = stack.pop() {
             for y in &self.nodes {
                 if self 
@@ -22,13 +17,19 @@ impl<T> Graph<T> {
                     .ok_or(DFSError::VertexNotFound).unwrap() && !w.contains(&y)
                 {
                     w.push(y);
-                    visited.push((y, i));
+                    dbg!(&visited);
+                    if visited.iter().find(|(n, parent)| n == &y && match parent {
+                        Some(p) => p != &x,
+                        None => true, // Finish short-circuiting, we already know this isn't a tree
+                    }).is_some() { return false; }
+                    println!("Didn't return, yet!");
+
+                    visited.push((y, Some(x)));
                     stack.push(y);
                 }
             }
-            i += 1;
         }
 
-        false
+        true
     }
 }
