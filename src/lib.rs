@@ -1,6 +1,6 @@
 use std::{hash::Hash, mem};
 use std::
-    fmt::Debug
+    fmt::{Debug, Display}
 ;
 
 use thiserror::Error;
@@ -70,6 +70,7 @@ impl<T> Node<T> {
         Self { name, value }
     }
 }
+
 
 #[derive(Error, Debug)]
 pub enum FromMatrixError {

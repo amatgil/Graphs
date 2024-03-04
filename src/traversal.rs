@@ -5,20 +5,21 @@ use thiserror::Error;
 use crate::{Graph, Node};
 
 #[derive(Debug, Error)]
-enum DFSError {
+pub enum DFSError {
     #[error("starting vertex was not found in the graph")]
     VertexNotFound,
 }
 
 impl<T> Graph<T> {
-    fn dfs<'a, 'b>(
+    pub fn dfs<'a, 'b>(
         &'a self,
         v: &'b Node<T>,
-    ) -> Result<(Vec<&Node<T>>, Vec<(&Node<T>, &Node<T>)>), DFSError>
+    ) -> Result<(Vec<&'b Node<T>>, Vec<(&'b Node<T>, &'b Node<T>)>), DFSError>
     where
         'b: 'a,
+        T: PartialEq
     {
-        let mut w = vec![];
+        let mut w = vec![v];
         let mut stack = vec![v];
         let mut arestes = vec![];
 
@@ -26,7 +27,7 @@ impl<T> Graph<T> {
             for y in &self.nodes {
                 if self
                     .has_adjacency(x.name, y.name)
-                    .ok_or(DFSError::VertexNotFound)?
+                    .ok_or(DFSError::VertexNotFound)? && !w.contains(&y)
                 {
                     w.push(y);
                     stack.push(y);

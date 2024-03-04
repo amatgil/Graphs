@@ -25,5 +25,13 @@ fn dfs_basic() {
     ];
 
     let g = Graph::<()>::from_list(init).unwrap();
+
+    let res = g.dfs(&a).unwrap();
     dbg!(&g);
+    dbg!(res);
+    panic!()
+}
+
+#[test]
+fn trees() {
 }
