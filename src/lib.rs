@@ -1,6 +1,6 @@
 use std::{hash::Hash, mem};
 use std::
-    fmt::{Debug, Display}
+    fmt::Debug
 ;
 
 use thiserror::Error;

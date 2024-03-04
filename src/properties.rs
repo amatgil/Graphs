@@ -1,10 +1,10 @@
-use std::{collections::HashMap, fmt::Debug, path::PathBuf}; // TODO: Remove this when done
+use std::collections::HashMap;
 use std::hash::Hash;
 
-use crate::{traversal::DFSError, Graph, Node};
+use crate::{Graph, Node};
 
 impl<T> Graph<T> {
-    pub fn is_tree(&self) -> bool where T: Eq + Hash + Debug {
+    pub fn is_tree(&self) -> bool where T: Eq + Hash {
         let Some(v) = self.nodes.get(0) else { return true; };
 
         let mut w = vec![v];   
@@ -16,10 +16,7 @@ impl<T> Graph<T> {
                 if let Some(Some(p)) = parents.get(x) {
                     if p == &y { continue; }
                 }
-                if w.contains(&y) {
-                    dbg!(x, y, &w, parents);
-                    return false; 
-                }
+                if w.contains(&y) { return false; }
 
                 w.push(y);
                 stack.push(y);
