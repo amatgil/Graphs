@@ -7,3 +7,12 @@ This repo holds a small [Graph](https://en.wikipedia.org/wiki/Graph_(discrete_ma
 ```rs
 todo!()
 ```
+
+
+# Roadmap
+
+- [x] DFS 
+- [ ] BFS
+- [ ] Bipartite checking
+- [ ] Drawing
+    - [x] Check for tree-ness/cyclelessness
