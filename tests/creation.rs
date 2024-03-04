@@ -59,6 +59,7 @@ fn from_a_matrix() {
     assert!(g.has_adjacency('A', 'F').is_none());
 }
 
+
 #[test]
 fn from_a_list() {
     // Graph should be something like
@@ -179,4 +180,49 @@ fn from_a_list_again() {
 
     assert!(g.has_adjacency('A', 'F').is_none());
     assert!(g.has_adjacency('Z', 'F').is_none());
+}
+
+#[test]
+fn batch_adjacencies() {
+    // Graph should be something like
+    //┌─────A
+    //│     │
+    //│     │
+    //│     C────┐
+    //│          │
+    //│          │
+    //B──────────D
+
+    let a = Node::<()>::new('A', ());
+    let b = Node::<()>::new('B', ());
+    let c = Node::<()>::new('C', ());
+    let d = Node::<()>::new('D', ());
+
+    let init = vec![
+        (a, vec![b, c]),
+        (b, vec![a, d]),
+        (c, vec![a, d]),
+        (d, vec![b, c]),
+    ];
+
+    let g = Graph::<()>::from_list(init).unwrap();
+
+    assert!(g.adjacent_nodes('A').unwrap().contains(&&b));
+    assert!(g.has_adjacency('A', 'B').unwrap());
+    assert!(g.adjacent_nodes('A').unwrap().contains(&&c));
+    assert!(!g.adjacent_nodes('A').unwrap().contains(&&d));
+
+    assert!(g.adjacent_nodes('B').unwrap().contains(&&a));
+    assert!(g.adjacent_nodes('C').unwrap().contains(&&a));
+    assert!(!g.adjacent_nodes('D').unwrap().contains(&&a));
+
+    assert!(g.adjacent_nodes('C').unwrap().contains(&&a));
+    assert!(g.adjacent_nodes('C').unwrap().contains(&&d));
+    assert!(!g.adjacent_nodes('C').unwrap().contains(&&b));
+
+    assert!(g.adjacent_nodes('A').unwrap().contains(&&c));
+    assert!(g.adjacent_nodes('D').unwrap().contains(&&c));
+    assert!(!g.adjacent_nodes('B').unwrap().contains(&&c));
+
+    assert!(g.adjacent_nodes('F').is_none());
 }

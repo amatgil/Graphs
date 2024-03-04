@@ -31,6 +31,44 @@ fn dfs_basic() {
 }
 
 #[test]
+fn dfs_advanced() {
+    let a = Node::<()>::new('A', ());
+    let b = Node::<()>::new('B', ());
+    let c = Node::<()>::new('C', ());
+    let d = Node::<()>::new('D', ());
+    let e = Node::<()>::new('E', ());
+
+    let init = vec![
+        (a, vec![e, b]),
+        (b, vec![a, c]),
+        (c, vec![e, b]),
+        (d, vec![e]),
+        (e, vec![a, c, d]),
+    ];
+
+    let g = Graph::<()>::from_list(init).unwrap();
+    let res = g.dfs(&a).unwrap();
+
+    assert_eq!(res.0, vec![&a, &e, &b, &c, &d]);
+    
+    let disconnected_l = vec![
+        (a, vec![]),
+        (b, vec![e]),
+        (c, vec![d, e]),
+        (d, vec![c]),
+        (e, vec![b, c]),
+    ];
+
+    let disconnected = Graph::<()>::from_list(disconnected_l).unwrap();
+    let res = disconnected.dfs(&a).unwrap();
+
+    assert!(res.0.len() == 1);
+
+    let res = disconnected.dfs(&b).unwrap();
+    assert_eq!(res.0, vec![&b, &e, &c, &d]);
+
+}
+#[test]
 fn trees() {
     let a = Node::<()>::new('A', ());
     let b = Node::<()>::new('B', ());
