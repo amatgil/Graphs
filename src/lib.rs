@@ -57,7 +57,7 @@ impl AdjMatrix {
 
     /// Assumes x is in bounds
     fn get_adjacent(&self, x: usize) -> &[bool] {
-        &self.values[x*4..(x+1)*4]
+        &self.values[x*self.n..(x+1)*self.n]
     }
 }
 
