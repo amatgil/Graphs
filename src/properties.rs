@@ -1,32 +1,29 @@
-use std::{fmt::Debug, path::PathBuf}; // TODO: Remove this when done
+use std::{collections::HashMap, fmt::Debug, path::PathBuf}; // TODO: Remove this when done
+use std::hash::Hash;
 
 use crate::{traversal::DFSError, Graph, Node};
 
 impl<T> Graph<T> {
-    pub fn is_tree(&self) -> bool where T: PartialEq + Debug {
+    pub fn is_tree(&self) -> bool where T: Eq + Hash + Debug {
         let Some(v) = self.nodes.get(0) else { return true; };
 
         let mut w = vec![v];   
-        let mut visited = vec![(v, None)]; // tuples of (vertex, Option<Parent>)
         let mut stack = vec![v];
+        let mut parents: HashMap<&Node<T>, Option<&Node<T>>> = HashMap::new();
 
         while let Some(x) = stack.pop() {
-            for y in &self.nodes {
-                if self 
-                    .has_adjacency(x.name, y.name)
-                    .ok_or(DFSError::VertexNotFound).unwrap() && !w.contains(&y)
-                {
-                    w.push(y);
-                    dbg!(&visited);
-                    if visited.iter().find(|(n, parent)| n == &y && match parent {
-                        Some(p) => p != &x,
-                        None => true, // Finish short-circuiting, we already know this isn't a tree
-                    }).is_some() { return false; }
-                    println!("Didn't return, yet!");
-
-                    visited.push((y, Some(x)));
-                    stack.push(y);
+            for y in self.adjacent_nodes(x.name).unwrap() {
+                if let Some(Some(p)) = parents.get(x) {
+                    if p == &y { continue; }
                 }
+                if w.contains(&y) {
+                    dbg!(x, y, &w, parents);
+                    return false; 
+                }
+
+                w.push(y);
+                stack.push(y);
+                parents.insert(y, Some(x));
             }
         }
 

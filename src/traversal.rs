@@ -24,10 +24,8 @@ impl<T> Graph<T> {
         let mut arestes = vec![];
 
         while let Some(x) = stack.pop() {
-            for y in &self.nodes {
-                if self
-                    .has_adjacency(x.name, y.name)
-                    .ok_or(DFSError::VertexNotFound)? && !w.contains(&y)
+            for y in self.adjacent_nodes(x.name).ok_or(DFSError::VertexNotFound)? {
+                if !w.contains(&y)
                 {
                     w.push(y);
                     stack.push(y);
