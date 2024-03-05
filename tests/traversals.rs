@@ -160,6 +160,7 @@ fn bfs_basic() {
 
     let res = g.bfs(&a).unwrap();
     assert_eq!(res.0, vec![(&a, 0), (&b, 1), (&c, 1), (&d, 2)]);
+    assert_eq!(res.2, 2);
 }
 
 #[test]
@@ -171,17 +172,19 @@ fn bfs_advanced() {
     let e = Node::<()>::new('E', ());
 
     let init = vec![
-        (a, vec![e, b]),
-        (b, vec![a, c]),
-        (c, vec![e, b]),
-        (d, vec![e]),
-        (e, vec![a, c, d]),
+        (c, vec![d, e]),
+        (b, vec![a, e]),
+        (d, vec![c]),
+        (e, vec![b, c]),
+        (a, vec![b]),
     ];
 
     let g = Graph::<()>::from_list(init).unwrap();
-    let res = g.bfs(&a).unwrap();
+    let res = g.bfs(&c).unwrap();
+    dbg!(&res);
 
-    assert_eq!(res.0, vec![(&a, 0), (&e, 1), (&b, 1), (&c, 2), (&d, 2)]);
+    assert_eq!(res.0, vec![(&c, 0), (&d, 1), (&e, 1), (&b, 2), (&a, 3)]);
+    assert_eq!(res.2, 3);
     
     let disconnected_l = vec![
         (a, vec![]),
@@ -198,4 +201,29 @@ fn bfs_advanced() {
 
     let res = disconnected.dfs(&b).unwrap();
     assert_eq!(res.0, vec![&b, &e, &c, &d]);
+}
+
+#[test]
+fn bfs_advanced2() {
+    let a = Node::<()>::new('A', ());
+    let b = Node::<()>::new('B', ());
+    let c = Node::<()>::new('C', ());
+    let d = Node::<()>::new('D', ());
+    let e = Node::<()>::new('E', ());
+
+    let init = vec![
+        (a, vec![e, b]),
+        (b, vec![a, c]),
+        (c, vec![e, b]),
+        (d, vec![e]),
+        (e, vec![a, c, d]),
+    ];
+
+    let g = Graph::<()>::from_list(init).unwrap();
+    let res = g.bfs(&a).unwrap();
+    dbg!(&res);
+
+    assert_eq!(res.0, vec![(&a, 0), (&e, 1), (&b, 1), (&c, 2), (&d, 2)]);
+    assert_eq!(res.2, 2);
+    
 }

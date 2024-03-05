@@ -13,7 +13,7 @@ dependencies = [
 [[package]]
 name = "ppmitzador"
 version = "0.1.0"
-source = "git+ssh://git@ilsrv.com:6722/Amat/ppmitzador.git#f9d99cb38425d91bfd4e8cf100b2ffa3e1f9b858"
+source = "git+https://github.com/amatgil/ppmitzador#f9d99cb38425d91bfd4e8cf100b2ffa3e1f9b858"
 
 [[package]]
 name = "proc-macro2"

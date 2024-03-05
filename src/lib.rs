@@ -1,7 +1,5 @@
+use core::fmt;
 use std::{hash::Hash, mem};
-use std::
-    fmt::Debug
-;
 
 use thiserror::Error;
 use utils::{coords_to_idx, has_duplicates, idx_to_coords};
@@ -11,6 +9,7 @@ use crate::utils::dedup;
 mod utils;
 mod properties;
 mod traversal;
+mod drawing;
 
 #[derive(Clone, Debug, PartialEq, Eq)]
 pub struct Graph<T> {
@@ -63,7 +62,7 @@ impl AdjMatrix {
 
 /// Basic Node type, which the graph connects. Note that changing its name or its value (if any)
 /// will NOT change the structure of the graph.
-#[derive(Clone, Debug, PartialEq, Eq, Copy, Hash)]
+#[derive(Clone, PartialEq, Eq, Copy, Hash)]
 pub struct Node<T> {
     pub name: char,
     pub value: T,
@@ -71,8 +70,14 @@ pub struct Node<T> {
 
 impl<T> Node<T> {
     /// Convenience, normal constructor may also be used without problems
-    pub fn new(name: char, value: T) -> Self {
+    pub const fn new(name: char, value: T) -> Self {
         Self { name, value }
+    }
+}
+
+impl<T> fmt::Debug for Node<T> {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+        write!(f, "Node '{}'", self.name)
     }
 }
 
