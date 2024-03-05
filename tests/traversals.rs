@@ -126,11 +126,11 @@ fn trees() {
     let complete = Graph::from_list(complete_l).unwrap();
     let bowtie   = Graph::from_list(bowtie_l).unwrap();
 
-    assert!(first.is_tree());
-    assert!(second.is_tree());
-    assert!(!third.is_tree());
-    assert!(!complete.is_tree());
-    assert!(!bowtie.is_tree());
+    assert!(first.is_tree().0);
+    assert!(second.is_tree().0);
+    assert!(!third.is_tree().0);
+    assert!(!complete.is_tree().0);
+    assert!(!bowtie.is_tree().0);
 }
 
 #[test]

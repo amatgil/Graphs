@@ -10,6 +10,13 @@ const E: Node<()> = Node::<()>::new('E', ());
 const F: Node<()> = Node::<()>::new('F', ());
 const G: Node<()> = Node::<()>::new('G', ());
 const H: Node<()> = Node::<()>::new('H', ());
+const I: Node<()> = Node::<()>::new('I', ());
+const J: Node<()> = Node::<()>::new('J', ());
+const K: Node<()> = Node::<()>::new('K', ());
+const L: Node<()> = Node::<()>::new('L', ());
+const M: Node<()> = Node::<()>::new('M', ());
+const N: Node<()> = Node::<()>::new('N', ());
+const O: Node<()> = Node::<()>::new('O', ());
 
 #[test]
 fn drawing_tree_basic() {
@@ -60,19 +67,25 @@ fn drawing_tree_tall() {
 }
 
 #[test]
-fn drawing_tree_tall2() {
+fn drawing_tree_gerard() {
     let init = vec![
-        (A, vec![B, C, H]),
-        (B, vec![A, D, E]),
-        (C, vec![A]),
-        (D, vec![B, F, G]),
-        (E, vec![B]),
-        (F, vec![D]),
+        (A, vec![B, K]),
+        (B, vec![A, C, D]),
+        (C, vec![B]),
+        (D, vec![B, F, E, G, H]),
+        (E, vec![D]),
+        (F, vec![D, I, J]),
         (G, vec![D]),
-        (H, vec![A]),
+        (H, vec![D]),
+        (I, vec![F]),
+        (J, vec![F]),
+        (K, vec![A, L]),
+        (L, vec![K, M, N]),
+        (M, vec![L]),
+        (N, vec![L]),
     ];
 
     let g = Graph::from_list(init).unwrap();
 
-    g.draw_and_save_to_file("tree_tall2.ppm", 1000, 1000).unwrap();
+    g.draw_and_save_to_file("tree_gerard.ppm", 1000, 1000).unwrap();
 }

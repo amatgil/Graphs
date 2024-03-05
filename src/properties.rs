@@ -4,8 +4,11 @@ use std::hash::Hash;
 use crate::{Graph, Node};
 
 impl<T> Graph<T> {
-    pub fn is_tree(&self) -> bool where T: Eq + Hash {
-        let Some(v) = self.nodes.get(0) else { return true; };
+    /// Check if the graph is a tree (or, equivalently, if it doesn't have any cycles). Returns
+    /// (true, None) if it's a tree and (false, Some(n)) if it contains a cycle with n being one of
+    /// the nodes in the first cycle found
+    pub fn is_tree(&self) -> (bool, Option<&Node<T>>) where T: Eq + Hash {
+        let Some(v) = self.nodes.get(0) else { return (true, None); };
 
         let mut w = vec![v];   
         let mut stack = vec![v];
@@ -16,7 +19,7 @@ impl<T> Graph<T> {
                 if let Some(Some(p)) = parents.get(x) {
                     if p == &y { continue; }
                 }
-                if w.contains(&y) { return false; }
+                if w.contains(&y) { return (false, Some(y)); }
 
                 w.push(y);
                 stack.push(y);
@@ -24,6 +27,6 @@ impl<T> Graph<T> {
             }
         }
 
-        true
+        (true, None)
     }
 }

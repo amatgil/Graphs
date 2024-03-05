@@ -34,7 +34,7 @@ impl<T: cmp::Eq + hash::Hash > Graph<T>  {
         let height = ((height as f32)*0.7) as usize;
         let width = ((width as f32)*0.7) as usize;
 
-        if self.is_tree() {
+        if self.is_tree().0 {
             println!("Drawing a tree");
             let (nodes, arestes, max_dist) = self
                 .bfs(self.nodes.get(0).ok_or(DrawingError::EmptyGraph)?)
@@ -57,9 +57,10 @@ impl<T: cmp::Eq + hash::Hash > Graph<T>  {
 
             let mut final_node_positions: Vec<(&Node<T>, (usize, usize))> = vec![];
 
+            let spacing = width / nodes_by_dist.iter().map(|l| l.len()).max().unwrap();
             for (i, nodes_in_level) in nodes_by_dist.iter().enumerate() {
                 let y_position = height - layer_height*i;
-                let spacing = width / nodes_in_level.len();
+                //let spacing = width / nodes_in_level.len();
                 let start = width / 2 - (spacing*(nodes_in_level.len() - 1)/2);
                 for (j, n) in nodes_in_level.iter().enumerate() {
                     let x = start + spacing*j;
