@@ -29,4 +29,12 @@ impl<T> Graph<T> {
 
         (true, None)
     }
+
+    pub fn is_connex(&self) -> bool where T: Eq + Hash {
+        if let Some(v) = self.nodes.get(0) {
+            self.nodes.len() == self.bfs(v).expect("Can not error: vertex must be in the graph").0.len()
+        }  else {
+            true // empty graph is connex
+        }
+    }
 }

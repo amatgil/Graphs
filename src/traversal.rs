@@ -11,6 +11,9 @@ pub enum TraversalError {
 }
 
 impl<T> Graph<T> {
+    /// Returns a vector of tuples that contain
+    /// - The nodes in the c.c.
+    /// - The edges that were explored
     pub fn dfs<'a, 'b>(
         &'a self,
         v: &'b Node<T>,
@@ -37,9 +40,9 @@ impl<T> Graph<T> {
         Ok((w, arestes))
     }
 
-    /// Returns a vector full of tuples that contains, in order:
-    /// - The list of nodes in the c.c. with their distances
-    /// - The list of edges that form the tree
+    /// Returns a vector of tuples that contain, in order:
+    /// - The nodes in the c.c. with their distances
+    /// - The edges that form the tree
     /// - The eccentricity (maximum distance) from the given node
     pub fn bfs<'a, 'b>(
         &'a self,
