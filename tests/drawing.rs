@@ -1,6 +1,6 @@
 use graphs::{Graph, Node};
 
-// These must be checked manually
+// These test must be verified manually
 
 const A: Node<()> = Node::<()>::new('A', ());
 const B: Node<()> = Node::<()>::new('B', ());
