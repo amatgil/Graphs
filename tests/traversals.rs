@@ -1,6 +1,14 @@
 use graphs::{Graph, Node};
 
 
+const A: Node<()> = Node::<()>::new('A', ());
+const B: Node<()> = Node::<()>::new('B', ());
+const C: Node<()> = Node::<()>::new('C', ());
+const D: Node<()> = Node::<()>::new('D', ());
+const E: Node<()> = Node::<()>::new('E', ());
+const F: Node<()> = Node::<()>::new('F', ());
+const G: Node<()> = Node::<()>::new('G', ());
+
 #[test]
 fn dfs_basic() {
     // Graph should be something like
@@ -12,125 +20,106 @@ fn dfs_basic() {
     //│          │
     //B──────────D
 
-    let a = Node::<()>::new('A', ());
-    let b = Node::<()>::new('B', ());
-    let c = Node::<()>::new('C', ());
-    let d = Node::<()>::new('D', ());
-
     let init = vec![
-        (a, vec![b, c]),
-        (b, vec![a, d]),
-        (c, vec![a, d]),
-        (d, vec![b, c]),
+        (A, vec![B, C]),
+        (B, vec![A, D]),
+        (C, vec![A, D]),
+        (D, vec![B, C]),
     ];
 
     let g = Graph::<()>::from_list(init).unwrap();
 
-    let res = g.dfs(&a).unwrap();
-    assert_eq!(res.0, vec![&a, &b, &c, &d]);
+    let res = g.dfs(&A).unwrap();
+    assert_eq!(res.0, vec![&A, &B, &C, &D]);
 }
 
 #[test]
 fn dfs_advanced() {
-    let a = Node::<()>::new('A', ());
-    let b = Node::<()>::new('B', ());
-    let c = Node::<()>::new('C', ());
-    let d = Node::<()>::new('D', ());
-    let e = Node::<()>::new('E', ());
-
     let init = vec![
-        (a, vec![e, b]),
-        (b, vec![a, c]),
-        (c, vec![e, b]),
-        (d, vec![e]),
-        (e, vec![a, c, d]),
+        (A, vec![E, B]),
+        (B, vec![A, C]),
+        (C, vec![E, B]),
+        (D, vec![E]),
+        (E, vec![A, C, D]),
     ];
 
     let g = Graph::<()>::from_list(init).unwrap();
-    let res = g.dfs(&a).unwrap();
+    let res = g.dfs(&A).unwrap();
 
-    assert_eq!(res.0, vec![&a, &e, &b, &c, &d]);
+    assert_eq!(res.0, vec![&A, &E, &B, &C, &D]);
     
     let disconnected_l = vec![
-        (a, vec![]),
-        (b, vec![e]),
-        (c, vec![d, e]),
-        (d, vec![c]),
-        (e, vec![b, c]),
+        (A, vec![]),
+        (B, vec![E]),
+        (C, vec![D, E]),
+        (D, vec![C]),
+        (E, vec![B, C]),
     ];
 
     let disconnected = Graph::<()>::from_list(disconnected_l).unwrap();
-    let res = disconnected.dfs(&a).unwrap();
+    let res = disconnected.dfs(&A).unwrap();
 
     assert!(res.0.len() == 1);
 
-    let res = disconnected.dfs(&b).unwrap();
-    assert_eq!(res.0, vec![&b, &e, &c, &d]);
+    let res = disconnected.dfs(&B).unwrap();
+    assert_eq!(res.0, vec![&B, &E, &C, &D]);
 
 }
 #[test]
 fn trees() {
-    let a = Node::<()>::new('A', ());
-    let b = Node::<()>::new('B', ());
-    let c = Node::<()>::new('C', ());
-    let d = Node::<()>::new('D', ());
-    let e = Node::<()>::new('E', ());
-    let f = Node::<()>::new('F', ());
-    let g = Node::<()>::new('G', ());
-
     let first_l = vec![
-        (a, vec![e, b]),
-        (b, vec![a]),
-        (c, vec![e]),
-        (d, vec![e]),
-        (e, vec![a, c, d]),
+        (A, vec![E, B]),
+        (B, vec![A]),
+        (C, vec![E]),
+        (D, vec![E]),
+        (E, vec![A, C, D]),
     ];
 
    let second_l = vec![
-        (a, vec![b,c]),
-        (b, vec![d,a,e]),
-        (c, vec![a,f,g]),
-        (d, vec![b]),
-        (e, vec![b]),
-        (f, vec![c]),
-        (g, vec![c]),
+        (A, vec![B,C]),
+        (B, vec![D,A,E]),
+        (C, vec![A,F,G]),
+        (D, vec![B]),
+        (E, vec![B]),
+        (F, vec![C]),
+        (G, vec![C]),
     ];
 
 
     let third_l = vec![
-        (a, vec![e, b]),
-        (b, vec![a, c]),
-        (c, vec![e, b]),
-        (d, vec![e]),
-        (e, vec![a, c, d]),
+        (A, vec![E, B]),
+        (B, vec![A, C]),
+        (C, vec![E, B]),
+        (D, vec![E]),
+        (E, vec![A, C, D]),
     ];
 
     let complete_l = vec![
-        (a, vec![  b,c,d]),
-        (b, vec![a,  c,d]),
-        (c, vec![a,b,  d]),
-        (d, vec![a,b,c  ]),
+        (A, vec![  B,C,D]),
+        (B, vec![A,  C,D]),
+        (C, vec![A,B,  D]),
+        (D, vec![A,B,C  ]),
     ];
 
-    let bowtie_l = vec![
-        (a, vec![b,c]),
-        (b, vec![a,c]),
-        (c, vec![a,b,e,d]),
-        (d, vec![e,c]),
-        (e, vec![d,c])
+    let butterfly_l = vec![
+        (A, vec![B,C]),
+        (B, vec![A,C]),
+        (C, vec![A,B,E,D]),
+        (D, vec![E,C]),
+        (E, vec![D,C])
     ];
 
-    let first    = Graph::from_list(first_l).unwrap();
-    let second   = Graph::from_list(second_l).unwrap();
-    let third    = Graph::from_list(third_l).unwrap();
-    let complete = Graph::from_list(complete_l).unwrap();
-    let bowtie   = Graph::from_list(bowtie_l).unwrap();
+    let first         = Graph::from_list(first_l).unwrap();
+    let second        = Graph::from_list(second_l).unwrap();
+    let third         = Graph::from_list(third_l).unwrap();
+    let complete      = Graph::from_list(complete_l).unwrap();
+    let butterfly_l   = Graph::from_list(butterfly_l).unwrap();
 
     assert!(first.is_tree().0);
     assert!(second.is_tree().0);
     assert!(!third.is_tree().0);
     assert!(!complete.is_tree().0);
-    assert!(!bowtie.is_tree().0);
+    assert!(!butterfly_l.is_tree().0);
 }
 
 #[test]
@@ -144,86 +133,94 @@ fn bfs_basic() {
     //│          │
     //B──────────D
 
-    let a = Node::<()>::new('A', ());
-    let b = Node::<()>::new('B', ());
-    let c = Node::<()>::new('C', ());
-    let d = Node::<()>::new('D', ());
-
     let init = vec![
-        (a, vec![b, c]),
-        (b, vec![a, d]),
-        (c, vec![a, d]),
-        (d, vec![b, c]),
+        (A, vec![B, C]),
+        (B, vec![A, D]),
+        (C, vec![A, D]),
+        (D, vec![B, C]),
     ];
 
     let g = Graph::<()>::from_list(init).unwrap();
 
-    let res = g.bfs(&a).unwrap();
-    assert_eq!(res.0, vec![(&a, 0), (&b, 1), (&c, 1), (&d, 2)]);
+    let res = g.bfs(&A).unwrap();
+    assert_eq!(res.0, vec![(&A, 0), (&B, 1), (&C, 1), (&D, 2)]);
     assert_eq!(res.2, 2);
 }
 
 #[test]
 fn bfs_advanced() {
-    let a = Node::<()>::new('A', ());
-    let b = Node::<()>::new('B', ());
-    let c = Node::<()>::new('C', ());
-    let d = Node::<()>::new('D', ());
-    let e = Node::<()>::new('E', ());
-
     let init = vec![
-        (c, vec![d, e]),
-        (b, vec![a, e]),
-        (d, vec![c]),
-        (e, vec![b, c]),
-        (a, vec![b]),
+        (C, vec![D, E]),
+        (B, vec![A, E]),
+        (D, vec![C]),
+        (E, vec![B, C]),
+        (A, vec![B]),
     ];
 
     let g = Graph::<()>::from_list(init).unwrap();
-    let res = g.bfs(&c).unwrap();
+    let res = g.bfs(&C).unwrap();
     dbg!(&res);
 
-    assert_eq!(res.0, vec![(&c, 0), (&d, 1), (&e, 1), (&b, 2), (&a, 3)]);
+    assert_eq!(res.0, vec![(&C, 0), (&D, 1), (&E, 1), (&B, 2), (&A, 3)]);
     assert_eq!(res.2, 3);
     
     let disconnected_l = vec![
-        (a, vec![]),
-        (b, vec![e]),
-        (c, vec![d, e]),
-        (d, vec![c]),
-        (e, vec![b, c]),
+        (A, vec![]),
+        (B, vec![E]),
+        (C, vec![D, E]),
+        (D, vec![C]),
+        (E, vec![B, C]),
     ];
 
     let disconnected = Graph::<()>::from_list(disconnected_l).unwrap();
-    let res = disconnected.dfs(&a).unwrap();
+    let res = disconnected.dfs(&A).unwrap();
 
     assert!(res.0.len() == 1);
 
-    let res = disconnected.dfs(&b).unwrap();
-    assert_eq!(res.0, vec![&b, &e, &c, &d]);
+    let res = disconnected.dfs(&B).unwrap();
+    assert_eq!(res.0, vec![&B, &E, &C, &D]);
 }
 
 #[test]
 fn bfs_advanced2() {
-    let a = Node::<()>::new('A', ());
-    let b = Node::<()>::new('B', ());
-    let c = Node::<()>::new('C', ());
-    let d = Node::<()>::new('D', ());
-    let e = Node::<()>::new('E', ());
-
     let init = vec![
-        (a, vec![e, b]),
-        (b, vec![a, c]),
-        (c, vec![e, b]),
-        (d, vec![e]),
-        (e, vec![a, c, d]),
+        (A, vec![E, B]),
+        (B, vec![A, C]),
+        (C, vec![E, B]),
+        (D, vec![E]),
+        (E, vec![A, C, D]),
     ];
 
     let g = Graph::<()>::from_list(init).unwrap();
-    let res = g.bfs(&a).unwrap();
+    let res = g.bfs(&A).unwrap();
     dbg!(&res);
 
-    assert_eq!(res.0, vec![(&a, 0), (&e, 1), (&b, 1), (&c, 2), (&d, 2)]);
+    assert_eq!(res.0, vec![(&A, 0), (&E, 1), (&B, 1), (&C, 2), (&D, 2)]);
     assert_eq!(res.2, 2);
     
+}
+
+#[test]
+fn connectedness() {
+    let init = vec![
+        (A, vec![B, C]),
+        (B, vec![A, D]),
+        (C, vec![A, D]),
+        (D, vec![B, C]),
+    ];
+
+    let g = Graph::<()>::from_list(init).unwrap();
+
+    assert!(g.is_connex());
+
+    let disconnected_l = vec![
+        (A, vec![]),
+        (B, vec![E]),
+        (C, vec![D, E]),
+        (D, vec![C]),
+        (E, vec![B, C]),
+    ];
+
+    let disconnected = Graph::<()>::from_list(disconnected_l).unwrap();
+    assert!(!disconnected.is_connex())
 }

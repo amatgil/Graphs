@@ -16,7 +16,6 @@ const K: Node<()> = Node::<()>::new('K', ());
 const L: Node<()> = Node::<()>::new('L', ());
 const M: Node<()> = Node::<()>::new('M', ());
 const N: Node<()> = Node::<()>::new('N', ());
-const O: Node<()> = Node::<()>::new('O', ());
 
 #[test]
 fn drawing_tree_basic() {
